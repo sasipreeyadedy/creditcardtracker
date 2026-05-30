@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CC Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.9.0/dist/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #f6f5f3;
+  --surface:   #ffffff;
+  --surface2:  #f0efed;
+  --surface3:  #e8e7e4;
+  --line:      rgba(0,0,0,0.06);
+  --line-md:   rgba(0,0,0,0.09);
+  --text:      #0e0d0c;
+  --text-2:    #6b6a65;
+  --text-3:    #aaa9a3;
+  --accent:    #0e0d0c;
+  --accent-fg: #ffffff;
+  --blue:      #2563eb;
+  --blue-bg:   #eef3fd;
+  --blue-text: #1d3fa3;
+  --green:     #16a34a;
+  --green-bg:  #edfaf3;
+  --green-text:#136b35;
+  --amber:     #c9680a;
+  --amber-bg:  #fef5e7;
+  --amber-text:#8a4200;
+  --red-bg:    #fef1f1;
+  --red-text:  #8f1c1c;
+  --r2: 4px;
+  --r3: 8px;
+  --r4: 12px;
+  --r5: 16px;
+  --mono: 'IBM Plex Mono', monospace;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:        #111110;
+    --surface:   #1a1a18;
+    --surface2:  #222220;
+    --surface3:  #2c2c29;
+    --line:      rgba(255,255,255,0.055);
+    --line-md:   rgba(255,255,255,0.09);
+    --text:      #eeede8;
+    --text-2:    #87867f;
+    --text-3:    #4e4d48;
+    --accent:    #eeede8;
+    --accent-fg: #0e0d0c;
+    --blue:      #5b9cf6;
+    --blue-bg:   #1a2740;
+    --blue-text: #90bcf8;
+    --green:     #3ecf6a;
+    --green-bg:  #122414;
+    --green-text:#7fdeaa;
+    --amber:     #f0a840;
+    --amber-bg:  #261b08;
+    --amber-text:#f5c87a;
+    --red-bg:    #220e0e;
+    --red-text:  #f28a8a;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.25);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.3);
+  }
+}
+
+html { font-size: 15px; -webkit-font-smoothing: antialiased; }
+body {
+  font-family: 'IBM Plex Sans Thai', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+.wrap { max-width: 620px; margin: 0 auto; padding: 0 24px 100px; }
+
+/* ── HEADER ── */
+header {
+  padding: 40px 0 28px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+.hd-eyebrow {
+  font-size: 10px; font-weight: 500; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--text-3);
+  margin-bottom: 6px;
+}
+header h1 {
+  font-size: 24px; font-weight: 600; letter-spacing: -0.03em;
+  color: var(--text); line-height: 1.1;
+}
+.hd-cards { display: flex; gap: 5px; margin-top: 10px; }
+.hd-chip {
+  font-size: 10px; font-weight: 500; letter-spacing: 0.03em;
+  padding: 3px 10px; border-radius: 99px;
+  border: 1px solid var(--line-md);
+  color: var(--text-3); background: var(--surface);
+  font-family: var(--mono);
+}
+.hd-date {
+  font-size: 11px; color: var(--text-3); font-family: var(--mono);
+  text-align: right; padding-top: 6px; line-height: 1.5;
+}
+
+/* ── NAV ── */
+nav {
+  display: flex;
+  background: var(--surface);
+  border: 1px solid var(--line-md);
+  border-radius: var(--r4);
+  padding: 4px;
+  gap: 2px;
+  margin-bottom: 32px;
+  box-shadow: var(--shadow-sm);
+}
+.nav-btn {
+  flex: 1;
+  background: none; border: none; border-radius: var(--r3);
+  padding: 9px 8px;
+  font-size: 12px; font-weight: 500;
+  font-family: 'IBM Plex Sans Thai', sans-serif;
+  color: var(--text-3); cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: color 0.15s, background 0.15s;
+  letter-spacing: 0.01em;
+}
+.nav-btn:hover { color: var(--text-2); background: var(--surface2); }
+.nav-btn.active {
+  color: var(--text);
+  background: var(--bg);
+  box-shadow: var(--shadow-sm);
+}
+.nav-btn i { font-size: 15px; }
+
+/* ── SECTIONS ── */
+.section { display: none; }
+.section.active { display: block; animation: up 0.2s ease; }
+@keyframes up { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+/* ── MONTH NAV ── */
+.month-row {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 24px;
+}
+.mn-btn {
+  width: 30px; height: 30px;
+  border: 1px solid var(--line-md); background: var(--surface);
+  border-radius: var(--r3); display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text-2); font-size: 14px;
+  box-shadow: var(--shadow-sm);
+  transition: background 0.12s, color 0.12s, box-shadow 0.12s;
+}
+.mn-btn:hover { background: var(--surface2); color: var(--text); box-shadow: var(--shadow-md); }
+.mn-label {
+  font-size: 14px; font-weight: 600; color: var(--text);
+  min-width: 100px; text-align: center; letter-spacing: -0.02em;
+}
+
+/* ── SECTION LABEL ── */
+.section-label {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--text-3); margin-bottom: 12px; margin-top: 2px;
+}
+
+/* ── CYCLE STRIP ── */
+.cycle-strip {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 10px; margin-bottom: 28px;
+}
+.cycle-tile {
+  background: var(--surface);
+  border: 1px solid var(--line-md);
+  border-radius: var(--r5);
+  padding: 16px 16px 14px;
+  position: relative; overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.15s;
+}
+.cycle-tile:hover { box-shadow: var(--shadow-md); }
+.ct-accent-bar {
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  border-radius: var(--r5) var(--r5) 0 0;
+}
+.ct-name {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.07em;
+  text-transform: uppercase; margin-bottom: 10px;
+  font-family: var(--mono);
+}
+.ct-amount {
+  font-size: 18px; font-weight: 600; letter-spacing: -0.03em;
+  margin-bottom: 3px; font-family: var(--mono);
+}
+.ct-range {
+  font-size: 10px; color: var(--text-3);
+  margin-bottom: 10px; font-family: var(--mono);
+}
+.pbar {
+  height: 3px; background: var(--surface3);
+  border-radius: 99px; overflow: hidden;
+}
+.pbar-fill { height: 100%; border-radius: 99px; transition: width 0.6s cubic-bezier(.4,0,.2,1); }
+.ct-badge {
+  display: inline-flex; align-items: center; margin-top: 10px;
+  font-size: 9px; font-weight: 600; letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 8px; border-radius: 99px;
+  font-family: var(--mono);
+}
+
+/* ── METRIC ROW ── */
+.metric-row {
+  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 10px; margin-bottom: 28px;
+}
+.mc {
+  background: var(--surface);
+  border: 1px solid var(--line-md);
+  border-radius: var(--r4);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-sm);
+}
+.mc.total {
+  background: var(--text); border-color: transparent;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+}
+.mc.total .mc-label { color: rgba(255,255,255,0.45); }
+.mc.total .mc-val { color: #fff; }
+.mc.total .mc-sub { color: rgba(255,255,255,0.3); }
+.mc-label {
+  font-size: 9px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase;
+  color: var(--text-3); margin-bottom: 7px; font-family: var(--mono);
+}
+.mc-val {
+  font-size: 15px; font-weight: 600; color: var(--text);
+  letter-spacing: -0.02em; font-family: var(--mono);
+}
+.mc-sub { font-size: 10px; color: var(--text-3); margin-top: 3px; }
+
+/* ── CHART CARD ── */
+.chart-card {
+  background: var(--surface);
+  border: 1px solid var(--line-md);
+  border-radius: var(--r5);
+  padding: 20px 22px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow-sm);
+}
+.cc-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.cc-title {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.11em; text-transform: uppercase;
+  color: var(--text-3);
+}
+.legend-row { display: flex; flex-wrap: wrap; gap: 12px; }
+.leg-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-2); }
+.leg-dot { width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0; }
+.chart-wrap { position: relative; }
+
+/* ── FORM CARD ── */
+.form-card {
+  background: var(--surface);
+  border: 1px solid var(--line-md);
+  border-radius: var(--r5);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+}
+.fc-title {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--text-3); margin-bottom: 20px;
+  padding-bottom: 16px; border-bottom: 1px solid var(--line);
+}
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+.form-grid.one { grid-template-columns: 1fr; }
+.fg label {
+  display: block; font-size: 10px; font-weight: 600; letter-spacing: 0.09em;
+  text-transform: uppercase; color: var(--text-3);
+  margin-bottom: 7px; font-family: var(--mono);
+}
+.fg input, .fg select, .fg textarea {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--line-md);
+  border-radius: var(--r3);
+  padding: 10px 13px;
+  font-size: 13px;
+  font-family: 'IBM Plex Sans Thai', sans-serif;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+  appearance: none; -webkit-appearance: none;
+}
+.fg select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23aaa' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
+}
+.fg input:focus, .fg select:focus, .fg textarea:focus {
+  border-color: var(--text-2);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.06);
+}
+@media (prefers-color-scheme: dark) {
+  .fg input:focus, .fg select:focus, .fg textarea:focus {
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.06);
+  }
+}
+.fg textarea { height: 72px; resize: vertical; line-height: 1.5; }
+.save-btn {
+  width: 100%; background: var(--text); color: var(--accent-fg);
+  border: none; border-radius: var(--r3); padding: 12px;
+  font-size: 13px; font-weight: 600;
+  font-family: 'IBM Plex Sans Thai', sans-serif;
+  cursor: pointer; letter-spacing: 0.02em;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  transition: opacity 0.15s, transform 0.1s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+}
+.save-btn:hover { opacity: 0.87; }
+.save-btn:active { opacity: 0.7; transform: scale(0.99); }
+
+/* ── FILTERS ── */
+.filter-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 18px; }
+.fb {
+  background: var(--surface);
+  border: 1px solid var(--line-md);
+  border-radius: 99px; padding: 5px 14px;
+  font-size: 11px; font-weight: 500; cursor: pointer;
+  color: var(--text-2); font-family: 'IBM Plex Sans Thai', sans-serif;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.12s;
+}
+.fb:hover { border-color: var(--text-2); color: var(--text); }
+.fb.active { background: var(--text); color: var(--accent-fg); border-color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.18); }
+
+/* ── LIST HEADER ── */
+.list-hdr {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 12px;
+}
+.list-hdr-count { font-size: 11px; color: var(--text-3); }
+.list-hdr-total { font-size: 15px; font-weight: 600; font-family: var(--mono); letter-spacing: -0.02em; }
+
+/* ── EXPENSE LIST ── */
+.elist {
+  background: var(--surface);
+  border: 1px solid var(--line-md);
+  border-radius: var(--r5);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+.eitem {
+  display: flex; align-items: center; gap: 13px;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--line);
+  transition: background 0.1s;
+}
+.eitem:last-child { border-bottom: none; }
+.eitem:hover { background: var(--surface2); }
+.eicon {
+  width: 38px; height: 38px; border-radius: var(--r3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.einfo { flex: 1; min-width: 0; }
+.emain { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.ename {
+  font-size: 13px; font-weight: 500; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.eamt { font-size: 13px; font-weight: 600; font-family: var(--mono); flex-shrink: 0; letter-spacing: -0.02em; }
+.emeta {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; color: var(--text-3); margin-top: 3px; flex-wrap: wrap;
+}
+.chip {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.04em;
+  padding: 2px 8px; border-radius: 99px;
+  font-family: var(--mono);
+}
+.chip-line { background: var(--blue-bg); color: var(--blue-text); }
+.chip-xu   { background: var(--green-bg); color: var(--green-text); }
+.chip-t1   { background: var(--amber-bg); color: var(--amber-text); }
+.del-btn {
+  background: none; border: none; cursor: pointer;
+  color: var(--text-3); padding: 6px 8px; border-radius: var(--r2);
+  font-size: 15px; flex-shrink: 0;
+  transition: color 0.12s, background 0.12s;
+}
+.del-btn:hover { color: #dc2626; background: var(--red-bg); }
+
+/* ── EMPTY ── */
+.empty {
+  text-align: center; padding: 56px 0; color: var(--text-3);
+}
+.empty i { font-size: 30px; display: block; margin-bottom: 12px; opacity: 0.25; }
+.empty p { font-size: 13px; }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(10px);
+  background: var(--text); color: var(--accent-fg);
+  padding: 10px 22px; border-radius: 99px;
+  font-size: 12px; font-weight: 500; font-family: var(--mono);
+  z-index: 999; opacity: 0; pointer-events: none;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  transition: opacity 0.22s, transform 0.22s cubic-bezier(.4,0,.2,1);
+  white-space: nowrap; letter-spacing: 0.03em;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 480px) {
+  .metric-row { grid-template-columns: 1fr 1fr; }
+  .form-grid { grid-template-columns: 1fr; }
+  .nav-btn span { display: none; }
+  .nav-btn i { font-size: 18px; }
+  .cycle-strip { grid-template-columns: 1fr; }
+  header { flex-direction: column; gap: 10px; }
+  .wrap { padding: 0 16px 100px; }
+}
+/* ── AUTH BAR ── */
+#auth-bar { margin-bottom: 20px; }
+.login-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--surface); border: 1px solid var(--line-md);
+  border-radius: var(--r4); padding: 10px 18px;
+  font-size: 13px; font-weight: 500;
+  font-family: 'IBM Plex Sans Thai', sans-serif;
+  color: var(--text); cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.15s, background 0.15s;
+  width: 100%; justify-content: center;
+}
+.login-btn:hover { box-shadow: var(--shadow-md); background: var(--surface2); }
+.user-row {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--surface); border: 1px solid var(--line-md);
+  border-radius: var(--r4); padding: 8px 14px;
+  box-shadow: var(--shadow-sm);
+}
+.user-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  object-fit: cover; flex-shrink: 0;
+  background: var(--surface3);
+}
+.user-name {
+  font-size: 12px; font-weight: 500; color: var(--text);
+  flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.logout-btn {
+  background: none; border: 1px solid var(--line-md);
+  border-radius: var(--r2); padding: 4px 10px;
+  font-size: 11px; font-weight: 500; color: var(--text-2);
+  font-family: 'IBM Plex Sans Thai', sans-serif;
+  cursor: pointer; display: flex; align-items: center; gap: 5px;
+  transition: color 0.12s, background 0.12s, border-color 0.12s; flex-shrink: 0;
+}
+.logout-btn:hover { color: var(--text); border-color: var(--text-2); background: var(--surface2); }
+
+/* ── SETTINGS ── */
+.settings-card {
+  background: var(--surface);
+  border: 1px solid var(--line-md);
+  border-radius: var(--r5);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 16px;
+}
+.sc-title {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--text-3); margin-bottom: 20px;
+  padding-bottom: 16px; border-bottom: 1px solid var(--line);
+}
+.card-setting-row {
+  display: grid; grid-template-columns: 1fr 40px 80px 36px;
+  gap: 10px; align-items: center; margin-bottom: 12px;
+}
+.card-setting-row:last-child { margin-bottom: 0; }
+.cs-dot {
+  width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+  justify-self: center;
+}
+.cs-input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--line-md);
+  border-radius: var(--r3);
+  padding: 8px 11px;
+  font-size: 13px;
+  font-family: 'IBM Plex Sans Thai', sans-serif;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.cs-input:focus {
+  border-color: var(--text-2);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.06);
+}
+@media (prefers-color-scheme: dark) {
+  .cs-input:focus { box-shadow: 0 0 0 3px rgba(255,255,255,0.06); }
+}
+.cs-day-input {
+  width: 100%; text-align: center;
+  background: var(--bg);
+  border: 1px solid var(--line-md);
+  border-radius: var(--r3);
+  padding: 8px 6px;
+  font-size: 13px; font-family: var(--mono);
+  color: var(--text); outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  -moz-appearance: textfield;
+}
+.cs-day-input::-webkit-outer-spin-button,
+.cs-day-input::-webkit-inner-spin-button { -webkit-appearance: none; }
+.cs-day-input:focus {
+  border-color: var(--text-2);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px rgba(0,0,0,0.06);
+}
+.cs-remove-btn {
+  width: 36px; height: 36px;
+  background: none; border: 1px solid var(--line-md);
+  border-radius: var(--r3); cursor: pointer;
+  color: var(--text-3); font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  transition: color 0.12s, background 0.12s, border-color 0.12s;
+}
+.cs-remove-btn:hover { color: #dc2626; background: var(--red-bg); border-color: #fca5a5; }
+.cs-header-row {
+  display: grid; grid-template-columns: 1fr 40px 80px 36px;
+  gap: 10px; margin-bottom: 8px;
+}
+.cs-header-label {
+  font-size: 9px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase;
+  color: var(--text-3); font-family: var(--mono);
+}
+.add-card-btn {
+  width: 100%; margin-top: 16px;
+  background: none; border: 1px dashed var(--line-md);
+  border-radius: var(--r3); padding: 10px;
+  font-size: 12px; font-weight: 500; cursor: pointer;
+  color: var(--text-3); font-family: 'IBM Plex Sans Thai', sans-serif;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: color 0.12s, background 0.12s, border-color 0.12s;
+}
+.add-card-btn:hover { color: var(--text); border-color: var(--text-2); background: var(--surface2); }
+.save-settings-btn {
+  width: 100%; background: var(--text); color: var(--accent-fg);
+  border: none; border-radius: var(--r3); padding: 12px;
+  font-size: 13px; font-weight: 600;
+  font-family: 'IBM Plex Sans Thai', sans-serif;
+  cursor: pointer; letter-spacing: 0.02em;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  transition: opacity 0.15s, transform 0.1s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  margin-top: 20px;
+}
+.save-settings-btn:hover { opacity: 0.87; }
+.save-settings-btn:active { opacity: 0.7; transform: scale(0.99); }
+.color-picker-wrap { position: relative; justify-self: center; }
+.color-swatch {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 2px solid var(--line-md); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color 0.12s;
+  overflow: hidden; padding: 0;
+  background: none;
+}
+.color-swatch:hover { border-color: var(--text-2); }
+.color-swatch input[type="color"] {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer;
+  width: 100%; height: 100%; border: none; padding: 0;
+}
+.cs-inner-dot {
+  width: 20px; height: 20px; border-radius: 50%;
+  pointer-events: none;
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="hd-left">
+      <div class="hd-eyebrow">expense tracker</div>
+      <h1>บัตรเครดิต</h1>
+      <div class="hd-cards" id="hd-chips">
+        <span class="hd-chip chip-custom-0">Line4356</span>
+        <span class="hd-chip chip-custom-1">XU2031</span>
+        <span class="hd-chip chip-custom-2">T1 3577</span>
+      </div>
+    </div>
+    <div class="hd-date" id="hd-date"></div>
+  </header>
+
+  <div id="auth-bar"></div>
+
+  <nav>
+    <button class="nav-btn active" onclick="showTab('dashboard')">
+      <i class="ti ti-layout-dashboard"></i><span>แดชบอร์ด</span>
+    </button>
+    <button class="nav-btn" onclick="showTab('add')">
+      <i class="ti ti-plus"></i><span>เพิ่มรายการ</span>
+    </button>
+    <button class="nav-btn" onclick="showTab('history')">
+      <i class="ti ti-list"></i><span>ประวัติ</span>
+    </button>
+    <button class="nav-btn" onclick="showTab('settings')">
+      <i class="ti ti-settings"></i><span>บัตร</span>
+    </button>
+  </nav>
+
+  <!-- DASHBOARD -->
+  <div id="tab-dashboard" class="section active">
+    <div class="month-row">
+      <button class="mn-btn" onclick="changeMonth(-1)"><i class="ti ti-chevron-left"></i></button>
+      <span class="mn-label" id="dash-month-label"></span>
+      <button class="mn-btn" onclick="changeMonth(1)"><i class="ti ti-chevron-right"></i></button>
+    </div>
+
+    <div class="section-label">รอบบิลปัจจุบัน</div>
+    <div class="cycle-strip" id="cycle-cards"></div>
+
+    <div class="section-label">สรุปเดือนนี้</div>
+    <div class="metric-row" id="metric-cards"></div>
+
+    <div class="chart-card">
+      <div class="cc-header">
+        <span class="cc-title">แยกตามบัตร</span>
+        <div class="legend-row" id="card-legend"></div>
+      </div>
+      <div class="chart-wrap" style="height:160px">
+        <canvas id="chartCards" role="img" aria-label="กราฟแท่งค่าใช้จ่ายแยกตามบัตรเครดิต"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="cc-header">
+        <span class="cc-title">แยกตามหมวดหมู่</span>
+        <div class="legend-row" id="cat-legend"></div>
+      </div>
+      <div class="chart-wrap" style="height:180px">
+        <canvas id="chartCats" role="img" aria-label="กราฟแท่งค่าใช้จ่ายแยกตามหมวดหมู่"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD -->
+  <div id="tab-add" class="section">
+    <div class="form-card">
+      <div class="fc-title">เพิ่มรายการใหม่</div>
+      <div class="form-grid">
+        <div class="fg">
+          <label>วันที่</label>
+          <input type="date" id="f-date">
+        </div>
+        <div class="fg">
+          <label>บัตรเครดิต</label>
+          <select id="f-card"></select>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="fg">
+          <label>ยอดเงิน (฿)</label>
+          <input type="number" id="f-amount" placeholder="0.00" min="0" step="0.01">
+        </div>
+        <div class="fg">
+          <label>หมวดหมู่</label>
+          <select id="f-cat">
+            <option value="อาหาร">🍜 อาหาร</option>
+            <option value="ช้อปปิ้ง">🛍 ช้อปปิ้ง</option>
+            <option value="เดินทาง">✈️ เดินทาง</option>
+            <option value="บันเทิง">🎬 บันเทิง</option>
+            <option value="สุขภาพ">💊 สุขภาพ</option>
+            <option value="อื่นๆ">📦 อื่นๆ</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-grid one">
+        <div class="fg">
+          <label>รายละเอียด</label>
+          <textarea id="f-desc" placeholder="ระบุรายละเอียด..."></textarea>
+        </div>
+      </div>
+      <button class="save-btn" onclick="addExpense()">
+        <i class="ti ti-check"></i> บันทึกรายการ
+      </button>
+    </div>
+  </div>
+
+  <!-- HISTORY -->
+  <div id="tab-history" class="section">
+    <div class="month-row">
+      <button class="mn-btn" onclick="changeMonth(-1)"><i class="ti ti-chevron-left"></i></button>
+      <span class="mn-label" id="hist-month-label"></span>
+      <button class="mn-btn" onclick="changeMonth(1)"><i class="ti ti-chevron-right"></i></button>
+    </div>
+    <div class="filter-row" id="card-filters"></div>
+    <div id="expense-list-container"></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div id="tab-settings" class="section">
+    <div class="settings-card">
+      <div class="sc-title">จัดการบัตรเครดิต</div>
+      <div class="cs-header-row">
+        <span class="cs-header-label">ชื่อบัตร</span>
+        <span class="cs-header-label" style="text-align:center">สี</span>
+        <span class="cs-header-label" style="text-align:center">ตัดรอบ</span>
+        <span></span>
+      </div>
+      <div id="card-settings-list"></div>
+      <button class="add-card-btn" onclick="addCardRow()">
+        <i class="ti ti-plus"></i> เพิ่มบัตรใหม่
+      </button>
+      <button class="save-settings-btn" onclick="saveSettings()">
+        <i class="ti ti-check"></i> บันทึกการตั้งค่า
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, query, where }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+// ─── 🔧 ใส่ค่า Firebase Config ของคุณที่นี่ ───────────────────────────────
+const firebaseConfig = {
+  apiKey:            "AIzaSyCFRwMp55GrvkLxwpocI1WNMStUQDVg-SM",
+  authDomain:        "credit-tracker-686ac.firebaseapp.com",
+  projectId:         "credit-tracker-686ac",
+  storageBucket:     "credit-tracker-686ac.firebasestorage.app",
+  messagingSenderId: "354426985586",
+  appId:             "1:354426985586:web:0f32fb05f8a409150436eb"
+};
+// ─────────────────────────────────────────────────────────────────────────────
+
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+// ── constants ──────────────────────────────────────────────────────────────
+const DEFAULT_CARDS_CONFIG = [
+  { name: 'Line4356', color: '#2563eb', cycleDay: 17 },
+  { name: 'XU2031',   color: '#16a34a', cycleDay: 20 },
+  { name: 'T1 3577',  color: '#d97706', cycleDay: 15 },
+];
+
+function loadCardsConfig() {
+  try {
+    const saved = localStorage.getItem('cc_tracker_cards');
+    if (saved) return JSON.parse(saved);
+  } catch(e) {}
+  return DEFAULT_CARDS_CONFIG.map(c => ({...c}));
+}
+
+function saveCardsConfig(cfg) {
+  localStorage.setItem('cc_tracker_cards', JSON.stringify(cfg));
+}
+
+let cardsConfig = loadCardsConfig();
+
+function buildCardMaps() {
+  const CARDS      = cardsConfig.map(c => c.name);
+  const CYCLE_DAY  = Object.fromEntries(cardsConfig.map(c => [c.name, c.cycleDay]));
+  const CARD_COLORS= Object.fromEntries(cardsConfig.map(c => [c.name, c.color]));
+  // chip classes — assign by index cycling through palettes
+  const PALETTES = [
+    { bg:'var(--blue-bg)',  txt:'var(--blue-text)',  bgD:'#1e2a40', txtD:'#93c5fd' },
+    { bg:'var(--green-bg)', txt:'var(--green-text)', bgD:'#162516', txtD:'#86efac' },
+    { bg:'var(--amber-bg)', txt:'var(--amber-text)', bgD:'#2a1e0a', txtD:'#fcd34d' },
+    { bg:'#f5f3ff', txt:'#5b21b6', bgD:'#1e1830', txtD:'#c4b5fd' },
+    { bg:'#fdf2f8', txt:'#9d174d', bgD:'#2a1020', txtD:'#f9a8d4' },
+  ];
+  const dark = isDark();
+  const CHIP_CLASS   = {};
+  const CYCLE_BG     = {};
+  const CYCLE_TXT    = {};
+  cardsConfig.forEach((c, i) => {
+    const p = PALETTES[i % PALETTES.length];
+    CHIP_CLASS[c.name]  = `chip-custom-${i}`;
+    CYCLE_BG[c.name]    = dark ? p.bgD  : p.bg;
+    CYCLE_TXT[c.name]   = dark ? p.txtD : p.txt;
+  });
+  return { CARDS, CYCLE_DAY, CARD_COLORS, CHIP_CLASS, CYCLE_BG, CYCLE_TXT };
+}
+
+// Inject dynamic chip styles
+function injectChipStyles() {
+  const PALETTES = [
+    { bg:'var(--blue-bg)',  txt:'var(--blue-text)'  },
+    { bg:'var(--green-bg)', txt:'var(--green-text)' },
+    { bg:'var(--amber-bg)', txt:'var(--amber-text)' },
+    { bg:'#f5f3ff', txt:'#5b21b6' },
+    { bg:'#fdf2f8', txt:'#9d174d' },
+  ];
+  let css = '';
+  cardsConfig.forEach((_, i) => {
+    const p = PALETTES[i % PALETTES.length];
+    css += `.chip-custom-${i}{background:${p.bg};color:${p.txt}}\n`;
+  });
+  let style = document.getElementById('dynamic-chip-styles');
+  if (!style) { style = document.createElement('style'); style.id = 'dynamic-chip-styles'; document.head.appendChild(style); }
+  style.textContent = css;
+}
+
+const CATS      = ['อาหาร','ช้อปปิ้ง','เดินทาง','บันเทิง','สุขภาพ','อื่นๆ'];
+const CAT_ICON  = {'อาหาร':'🍜','ช้อปปิ้ง':'🛍','เดินทาง':'✈️','บันเทิง':'🎬','สุขภาพ':'💊','อื่นๆ':'📦'};
+const CAT_BG    = {'อาหาร':'#fff7ed','ช้อปปิ้ง':'#f5f3ff','เดินทาง':'#eff6ff','บันเทิง':'#fdf2f8','สุขภาพ':'#f0fdf4','อื่นๆ':'#f9fafb'};
+const CAT_COLORS= {'อาหาร':'#ea580c','ช้อปปิ้ง':'#7c3aed','เดินทาง':'#2563eb','บันเทิง':'#db2777','สุขภาพ':'#16a34a','อื่นๆ':'#6b7280'};
+const MONTHS_TH = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+
+// ── state ──────────────────────────────────────────────────────────────────
+let expenses = [], currentUser = null, unsubscribe = null;
+let currentYear = new Date().getFullYear(), currentMonth = new Date().getMonth();
+let histFilter = 'all', chartCards = null, chartCats = null;
+
+const isDark = () => matchMedia('(prefers-color-scheme: dark)').matches;
+
+// ── auth UI ────────────────────────────────────────────────────────────────
+function renderAuthBar(user) {
+  const bar = document.getElementById('auth-bar');
+  if (!user) {
+    bar.innerHTML = `
+      <button class="login-btn" id="btn-login">
+        <svg width="16" height="16" viewBox="0 0 48 48" style="flex-shrink:0">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.08 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-3.59-13.46-8.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+        </svg>
+        เข้าสู่ระบบด้วย Google
+      </button>`;
+    document.getElementById('btn-login').onclick = loginWithGoogle;
+  } else {
+    bar.innerHTML = `
+      <div class="user-row">
+        <img src="${user.photoURL||''}" class="user-avatar" alt="">
+        <span class="user-name">${user.displayName||user.email}</span>
+        <button class="logout-btn" id="btn-logout"><i class="ti ti-logout"></i> ออกจากระบบ</button>
+      </div>`;
+    document.getElementById('btn-logout').onclick = logout;
+  }
+}
+
+async function loginWithGoogle() {
+  try {
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(auth, provider);
+  } catch(e) { showToast('Login ไม่สำเร็จ'); }
+}
+
+async function logout() {
+  if (unsubscribe) unsubscribe();
+  expenses = [];
+  await signOut(auth);
+}
+
+// ── firestore ──────────────────────────────────────────────────────────────
+function subscribeExpenses(uid) {
+  if (unsubscribe) unsubscribe();
+  const q = query(collection(db, 'expenses'), where('uid', '==', uid));
+  unsubscribe = onSnapshot(q, snap => {
+    expenses = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const active = document.querySelector('.section.active');
+    if (active?.id === 'tab-dashboard') renderDashboard();
+    if (active?.id === 'tab-history')   renderHistory();
+  });
+}
+
+async function saveExpense(exp) {
+  await addDoc(collection(db, 'expenses'), { ...exp, uid: currentUser.uid });
+}
+
+async function removeExpense(id) {
+  await deleteDoc(doc(db, 'expenses', id));
+}
+
+// ── helpers ────────────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+function fmt(n) { return Number(n).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function getMonthLabel() { return MONTHS_TH[currentMonth] + ' ' + (currentYear + 543); }
+function getMonthExpenses() {
+  return expenses.filter(e => {
+    const d = new Date(e.date);
+    return d.getFullYear()===currentYear && d.getMonth()===currentMonth;
+  });
+}
+function getCycleRange(card, refYear, refMonth) {
+  const { CYCLE_DAY } = buildCardMaps();
+  const cut = CYCLE_DAY[card];
+  let sm = refMonth-1, sy = refYear;
+  if (sm < 0) { sm = 11; sy--; }
+  return { start: new Date(sy, sm, cut+1), end: new Date(refYear, refMonth, cut) };
+}
+function getCycleExpenses(card) {
+  const { CYCLE_DAY } = buildCardMaps();
+  const now = new Date(), y = now.getFullYear(), m = now.getMonth(), d = now.getDate();
+  const cut = CYCLE_DAY[card];
+  let ry = y, rm = m;
+  if (d > cut) { rm = m+1; if (rm > 11) { rm = 0; ry++; } }
+  const { start, end } = getCycleRange(card, ry, rm);
+  return expenses.filter(e => { const ed = new Date(e.date); return e.card===card && ed>=start && ed<=end; });
+}
+
+// ── navigation ─────────────────────────────────────────────────────────────
+window.showTab = function(tab) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  const tabIdx = ['dashboard','add','history','settings'].indexOf(tab);
+  document.querySelectorAll('.nav-btn')[tabIdx].classList.add('active');
+  if (tab === 'dashboard') renderDashboard();
+  if (tab === 'history')   renderHistory();
+  if (tab === 'settings')  renderSettings();
+};
+
+window.changeMonth = function(dir) {
+  currentMonth += dir;
+  if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+  if (currentMonth < 0)  { currentMonth = 11; currentYear--; }
+  const a = document.querySelector('.section.active');
+  if (a.id === 'tab-dashboard') renderDashboard();
+  if (a.id === 'tab-history')   renderHistory();
+};
+
+window.setFilter = function(f) { histFilter = f; renderHistory(); };
+
+// ── render ─────────────────────────────────────────────────────────────────
+function renderCycleCards() {
+  const now = new Date(), d = now.getDate(), m = now.getMonth(), y = now.getFullYear();
+  const dark = isDark();
+  const { CARDS, CYCLE_DAY, CARD_COLORS, CYCLE_BG, CYCLE_TXT } = buildCardMaps();
+  let html = '';
+  CARDS.forEach(card => {
+    const cut = CYCLE_DAY[card];
+    let ry = y, rm = m;
+    if (d > cut) { rm = m+1; if (rm > 11) { rm = 0; ry++; } }
+    const { start, end } = getCycleRange(card, ry, rm);
+    const total = Math.round((end - start) / 86400000) + 1;
+    const used  = Math.round((now - start)  / 86400000) + 1;
+    const left  = Math.round((end - now)    / 86400000);
+    const pct   = Math.min(100, Math.max(0, Math.round((used/total)*100)));
+    const sum   = getCycleExpenses(card).reduce((s,e) => s+Number(e.amount), 0);
+    const startStr = start.toLocaleDateString('th-TH',{day:'numeric',month:'short'});
+    const endStr   = end.toLocaleDateString('th-TH',{day:'numeric',month:'short'});
+    const urgent   = left >= 0 && left <= 3;
+    const badgeBg  = urgent ? (dark?'#2a1010':'#fef2f2') : CYCLE_BG[card];
+    const badgeTxt = urgent ? (dark?'#fca5a5':'#991b1b') : CYCLE_TXT[card];
+    const label    = left < 0 ? 'รอบปิดแล้ว' : left === 0 ? 'ตัดรอบวันนี้' : `${left}d left`;
+    html += `<div class="cycle-tile">
+      <div class="ct-accent-bar" style="background:${CARD_COLORS[card]}"></div>
+      <div class="ct-name" style="color:${CARD_COLORS[card]}">${card}</div>
+      <div class="ct-amount">฿${fmt(sum)}</div>
+      <div class="ct-range">${startStr} – ${endStr}</div>
+      <div class="pbar"><div class="pbar-fill" style="width:${pct}%;background:${CARD_COLORS[card]}"></div></div>
+      <span class="ct-badge" style="background:${badgeBg};color:${badgeTxt}">${label}</span>
+    </div>`;
+  });
+  document.getElementById('cycle-cards').innerHTML = html;
+}
+
+function renderDashboard() {
+  document.getElementById('dash-month-label').textContent = getMonthLabel();
+  renderCycleCards();
+  const { CARDS, CYCLE_DAY, CARD_COLORS } = buildCardMaps();
+  const monthly = getMonthExpenses();
+  const total   = monthly.reduce((s,e) => s+Number(e.amount), 0);
+  let mhtml = `<div class="mc total"><div class="mc-label">รวมทั้งหมด</div><div class="mc-val">฿${fmt(total)}</div><div class="mc-sub">${monthly.length} รายการ</div></div>`;
+  CARDS.forEach(c => {
+    const sum = monthly.filter(e=>e.card===c).reduce((s,e)=>s+Number(e.amount),0);
+    mhtml += `<div class="mc"><div class="mc-label">${c}</div><div class="mc-val">฿${fmt(sum)}</div><div class="mc-sub">ตัดวันที่ ${CYCLE_DAY[c]}</div></div>`;
+  });
+  document.getElementById('metric-cards').innerHTML = mhtml;
+
+  const dark  = isDark();
+  const tick  = dark ? '#55554f' : '#b0afa9';
+  const grid  = dark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)';
+  const cardTotals = CARDS.map(c => monthly.filter(e=>e.card===c).reduce((s,e)=>s+Number(e.amount),0));
+  const catTotals  = CATS.map(cat => monthly.filter(e=>e.category===cat).reduce((s,e)=>s+Number(e.amount),0));
+
+  document.getElementById('card-legend').innerHTML = CARDS.map(c =>
+    `<span class="leg-item"><span class="leg-dot" style="background:${CARD_COLORS[c]}"></span>${c}</span>`).join('');
+  document.getElementById('cat-legend').innerHTML = CATS.map(c =>
+    `<span class="leg-item"><span class="leg-dot" style="background:${CAT_COLORS[c]}"></span>${c}</span>`).join('');
+
+  const chartOpts = (labels, data, colors) => ({
+    type: 'bar',
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderRadius: 4, borderSkipped: false }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { ticks: { callback: v => v===0?'0':'฿'+v.toLocaleString(), font:{size:10}, color: tick }, grid: { color: grid }, border: { display: false } },
+        x: { ticks: { font:{size:11}, color: tick, autoSkip: false }, grid: { display: false }, border: { display: false } }
+      }
+    }
+  });
+  if (chartCards) chartCards.destroy();
+  chartCards = new Chart(document.getElementById('chartCards'), chartOpts(CARDS, cardTotals, CARDS.map(c=>CARD_COLORS[c])));
+  if (chartCats) chartCats.destroy();
+  chartCats = new Chart(document.getElementById('chartCats'), chartOpts(CATS, catTotals, CATS.map(c=>CAT_COLORS[c])));
+}
+
+function renderHistory() {
+  document.getElementById('hist-month-label').textContent = getMonthLabel();
+  const { CARDS, CHIP_CLASS } = buildCardMaps();
+  document.getElementById('card-filters').innerHTML = ['all',...CARDS].map(c =>
+    `<button class="fb${histFilter===c?' active':''}" onclick="setFilter('${c}')">${c==='all'?'ทั้งหมด':c}</button>`).join('');
+  let monthly = getMonthExpenses();
+  if (histFilter !== 'all') monthly = monthly.filter(e => e.card===histFilter);
+  monthly = [...monthly].sort((a,b) => new Date(b.date)-new Date(a.date));
+  const container = document.getElementById('expense-list-container');
+  if (!monthly.length) {
+    container.innerHTML = `<div class="empty"><i class="ti ti-receipt-off"></i><p>ไม่มีรายการในเดือนนี้</p></div>`;
+    return;
+  }
+  const total = monthly.reduce((s,e) => s+Number(e.amount), 0);
+  container.innerHTML = `
+    <div class="list-hdr">
+      <span class="list-hdr-count">${monthly.length} รายการ</span>
+      <span class="list-hdr-total">฿${fmt(total)}</span>
+    </div>
+    <div class="elist">${monthly.map(e => `
+      <div class="eitem">
+        <div class="eicon" style="background:${CAT_BG[e.category]||'#f9fafb'}">${CAT_ICON[e.category]||'📦'}</div>
+        <div class="einfo">
+          <div class="emain">
+            <span class="ename">${e.desc||e.category}</span>
+            <span class="eamt">฿${fmt(e.amount)}</span>
+          </div>
+          <div class="emeta">
+            <span>${new Date(e.date).toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric'})}</span>
+            <span class="chip ${CHIP_CLASS[e.card]||'chip-custom-0'}">${e.card}</span>
+            <span>${e.category}</span>
+          </div>
+        </div>
+        <button class="del-btn" onclick="deleteExpense('${e.id.replace(/'/g,"\\'")}')"><i class="ti ti-trash"></i></button>
+      </div>`).join('')}
+    </div>`;
+}
+
+// ── settings ───────────────────────────────────────────────────────────────
+function renderSettings() {
+  const list = document.getElementById('card-settings-list');
+  list.innerHTML = cardsConfig.map((c, i) => `
+    <div class="card-setting-row" id="csrow-${i}">
+      <input class="cs-input" type="text" value="${c.name}" placeholder="ชื่อบัตร" id="cs-name-${i}">
+      <div class="color-picker-wrap">
+        <button class="color-swatch" title="เลือกสี" onclick="document.getElementById('cs-color-${i}').click()">
+          <div class="cs-inner-dot" id="cs-dot-${i}" style="background:${c.color}"></div>
+          <input type="color" id="cs-color-${i}" value="${c.color}"
+            oninput="document.getElementById('cs-dot-${i}').style.background=this.value">
+        </button>
+      </div>
+      <input class="cs-day-input" type="number" value="${c.cycleDay}" min="1" max="31" placeholder="วัน" id="cs-day-${i}">
+      <button class="cs-remove-btn" onclick="removeCardRow(${i})" title="ลบบัตร"><i class="ti ti-trash"></i></button>
+    </div>`).join('');
+}
+
+window.addCardRow = function() {
+  cardsConfig.push({ name: '', color: '#6366f1', cycleDay: 25 });
+  renderSettings();
+  const lastInput = document.getElementById(`cs-name-${cardsConfig.length-1}`);
+  if (lastInput) lastInput.focus();
+};
+
+window.removeCardRow = function(i) {
+  if (cardsConfig.length <= 1) { showToast('ต้องมีบัตรอย่างน้อย 1 ใบ'); return; }
+  cardsConfig.splice(i, 1);
+  renderSettings();
+};
+
+window.saveSettings = function() {
+  const newConfig = [];
+  for (let i = 0; i < cardsConfig.length; i++) {
+    const name = document.getElementById(`cs-name-${i}`)?.value.trim();
+    const color = document.getElementById(`cs-color-${i}`)?.value;
+    const dayVal = parseInt(document.getElementById(`cs-day-${i}`)?.value);
+    if (!name) { showToast(`กรุณาใส่ชื่อบัตรที่ ${i+1}`); return; }
+    if (!dayVal || dayVal < 1 || dayVal > 31) { showToast(`วันตัดรอบต้องเป็น 1-31`); return; }
+    newConfig.push({ name, color, cycleDay: dayVal });
+  }
+  cardsConfig = newConfig;
+  saveCardsConfig(cardsConfig);
+  injectChipStyles();
+  updateCardSelect();
+  updateHeaderChips();
+  renderDashboard();
+  showToast('บันทึกการตั้งค่าแล้ว ✓');
+  showTab('dashboard');
+};
+
+function updateCardSelect() {
+  const sel = document.getElementById('f-card');
+  if (!sel) return;
+  const { CARDS, CYCLE_DAY } = buildCardMaps();
+  sel.innerHTML = CARDS.map(c => `<option value="${c}">${c} — ตัดรอบ ${CYCLE_DAY[c]}</option>`).join('');
+}
+
+function updateHeaderChips() {
+  const { CARDS, CARD_COLORS, CHIP_CLASS } = buildCardMaps();
+  document.getElementById('hd-chips').innerHTML = CARDS.map((c, i) =>
+    `<span class="hd-chip chip-custom-${i}">${c}</span>`).join('');
+}
+
+// ── actions ────────────────────────────────────────────────────────────────
+window.addExpense = async function() {
+  if (!currentUser) { showToast('กรุณาเข้าสู่ระบบก่อน'); return; }
+  const date     = document.getElementById('f-date').value;
+  const card     = document.getElementById('f-card').value;
+  const amount   = parseFloat(document.getElementById('f-amount').value);
+  const category = document.getElementById('f-cat').value;
+  const desc     = document.getElementById('f-desc').value.trim();
+  if (!date)              { showToast('กรุณาเลือกวันที่'); return; }
+  if (!amount || amount <= 0) { showToast('กรุณาระบุยอดเงิน'); return; }
+  try {
+    await saveExpense({ date, card, amount, category, desc });
+    document.getElementById('f-amount').value = '';
+    document.getElementById('f-desc').value   = '';
+    showToast('บันทึกเรียบร้อย ✓');
+    const d = new Date(date);
+    currentYear = d.getFullYear(); currentMonth = d.getMonth();
+    showTab('history');
+  } catch(e) { showToast('บันทึกไม่สำเร็จ'); }
+};
+
+window.deleteExpense = async function(id) {
+  try { await removeExpense(id); showToast('ลบรายการแล้ว'); }
+  catch(e) { showToast('ลบไม่สำเร็จ'); }
+};
+
+// ── init ────────────────────────────────────────────────────────────────────
+const now = new Date();
+document.getElementById('f-date').value =
+  `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+document.getElementById('hd-date').textContent =
+  now.toLocaleDateString('th-TH',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+
+// init dynamic card config
+injectChipStyles();
+updateCardSelect();
+updateHeaderChips();
+
+onAuthStateChanged(auth, user => {
+  currentUser = user;
+  renderAuthBar(user);
+  if (user) {
+    subscribeExpenses(user.uid);
+  } else {
+    if (unsubscribe) unsubscribe();
+    expenses = [];
+    renderDashboard();
+  }
+});
+
+renderDashboard();
+</script>
+</body>
+</html>
